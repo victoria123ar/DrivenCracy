@@ -9,7 +9,7 @@ export async function postPoll (req, res) {
     { title },
     { abortEarly: false }
   );
-  
+
   try {
     // Title não pode ser uma string vazia, retornar status 422.
     if(!title)
@@ -20,7 +20,7 @@ export async function postPoll (req, res) {
     //Se expireAt for vazio deve ser considerado 30 dias de enquete por padrão.
     if(!expireAt)
     {
-      var date = new Date();
+      const date = new Date();
       expireAt = dateFormat(date.setDate(date.getDate() + 30), "yyyy-mm-dd HH:MM")
     }
 
