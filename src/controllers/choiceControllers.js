@@ -1,11 +1,11 @@
 import db from "../db/db.js";
-import { optionVoteArray } from "../services/optionVoteSchema.js";
+import { choiceVoteArray } from "../services/choiceVoteSchema.js";
 import mongoose from "mongoose";
 
 export async function postChoice(req, res) {
   const { title } = req.body;
   const { pollId } = req.body;
-  const { error } = optionVoteArray.validate({ title }, { abortEarly: false });
+  const { error } = choiceVoteArray.validate({ title }, { abortEarly: false });
 
   const dateNow = new Date();
   try {
@@ -23,7 +23,7 @@ export async function postChoice(req, res) {
     }
 
     const QtdDocuments = await db
-      .collection("option")
+      .collection("choice")
       .countDocuments({ title: title });
     if (QtdDocuments != 0) {
       return res.sendStatus(409);
@@ -35,7 +35,7 @@ export async function postChoice(req, res) {
       return res.sendStatus(403);
     }
 
-    await db.collection("option").insertOne({ title: title, pollId: pollId });
+    await db.collection("choice").insertOne({ title: title, pollId: pollId });
 
     return res.sendStatus(201);
   } catch (err) {
@@ -45,24 +45,21 @@ export async function postChoice(req, res) {
 }
 
 export async function getChoice(req, res) {
-    const { id } = req.params;
-    try{
+  const { id } = req.params;
+  try {
     const mongoObjectId = mongoose.Types.ObjectId(String(id));
     const surveyDocument = await db.collection("survey").findOne({
-        _id: mongoObjectId,
-      });
-      console.log(surveyDocument)
-      console.log(id)
-      const optionDocument = await db.collection("option").find().toArray();
-      console.log(optionDocument)
-      if (!surveyDocument) {
-        return res.sendStatus(404);
-      }
-return res.send(optionDocument);
+      _id: mongoObjectId,
+    });
 
+    const choiceDocument = await db.collection("choice").find().toArray();
 
-} catch (err) {
-  console.log(err);
-  res.sendStatus(500);
-}
+    if (!surveyDocument) {
+      return res.sendStatus(404);
+    }
+    return res.send(choiceDocument);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
 }
